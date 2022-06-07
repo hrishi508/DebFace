@@ -5,13 +5,36 @@ An implementation of the paper - "Jointly de-biasing face recognition and demogr
 # Directory Structure
 Use the tree command to recursively generate the directory structure and insert here.
 ```
+.
+├── adversarial_training.py
+├── backbones
+│   ├── am_softmax.py
+│   ├── classifier.py
+│   ├── debface.py
+│   ├── encoder.py
+│   ├── __init__.py
+│   ├── iresnet.py
+├── config1.ini
+├── config2.ini
+├── LICENSE
+├── model_summary.txt
+├── README.md
+├── train_classifiers.py
+└── utils
+    └── utils_config.py
 
+4 directories, 22 files
 ```
 The above tree shows the overall structure of repository.
 
 # Environment Setup
 
 ## Dependencies
+1. Python 3.6.9
+2. PyTorch 1.9.0+cpu
+3. torchsummary 1.5.1
+4. argparse 1.4.0
+5. configparser 5.2.0
 
 ## Using host OS environment:
 1. Check to see if your Python installation has pip. Enter the following in your terminal:
