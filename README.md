@@ -115,5 +115,5 @@ The above tree shows the overall structure of repository.
 <a id="1">[1]</a> 
 Gong, Sixue and Liu, Xiaoming and Jain, A (2020). 
 Jointly de-biasing face recognition and demographic attribute estimation 
-ECCV, [11(3), 147-148](http://www.ecva.net/papers/eccv_2020/papers_ECCV/papers/123740324.pdf).
+ECCV, [link to the paper](http://www.ecva.net/papers/eccv_2020/papers_ECCV/papers/123740324.pdf).
 
