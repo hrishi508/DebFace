@@ -28,6 +28,6 @@ class Am_softmax(nn.Module):
         index.scatter_(1, label.data.view(-1, 1), 1)
         index = index.byte()
         output = cos_theta * 1.0
-        output[index] = phi[index] #only change the correct predicted output
+        output[index.bool()] = phi[index.bool()] #only change the correct predicted output
         output *= self.s # scale up in order to make softmax work,  first introduced in normface
         return output
