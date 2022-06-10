@@ -187,25 +187,25 @@
          IResNet-184                 [-1, 2048]               0
             ReLU-185                 [-1, 2048]               0
          Encoder-186                 [-1, 2048]               0
-          Linear-187                    [-1, 2]           1,026
-      Classifier-188                    [-1, 2]               0
+          Linear-187                    [-1, 4]           2,052
+      Classifier-188                    [-1, 4]               0
           Linear-189                    [-1, 4]           2,052
       Classifier-190                    [-1, 4]               0
-          Linear-191                    [-1, 5]           2,565
-      Classifier-192                    [-1, 5]               0
-          Linear-193                  [-1, 100]          51,300
-      Classifier-194                  [-1, 100]               0
+          Linear-191                    [-1, 4]           2,052
+      Classifier-192                    [-1, 4]               0
+          Linear-193                    [-1, 4]           2,052
+      Classifier-194                    [-1, 4]               0
           Linear-195                    [-1, 1]           2,049
       Classifier-196                    [-1, 1]               0
           Linear-197                    [-1, 1]           2,049
       Classifier-198                    [-1, 1]               0
 ================================================================
-Total params: 82,191,665
-Trainable params: 82,187,569
+Total params: 82,142,930
+Trainable params: 82,138,834
 Non-trainable params: 4,096
 ----------------------------------------------------------------
 Input size (MB): 0.14
 Forward/backward pass size (MB): 151.48
-Params size (MB): 313.54
-Estimated Total Size (MB): 465.16
+Params size (MB): 313.35
+Estimated Total Size (MB): 464.97
 ----------------------------------------------------------------

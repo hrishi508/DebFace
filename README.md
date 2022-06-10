@@ -35,6 +35,7 @@ The above tree shows the overall structure of repository.
 3. torchsummary 1.5.1
 4. argparse 1.4.0
 5. configparser 5.2.0
+6. torchviz 0.0.2
 
 ## Using host OS environment:
 1. Check to see if your Python installation has pip. Enter the following in your terminal:

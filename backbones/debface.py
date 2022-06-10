@@ -13,24 +13,24 @@ class DebFace(nn.Module):
         self.C_age = Classifier(num_classes=cfg.n_age_classes)
         self.C_race = Classifier(num_classes=cfg.n_race_classes)
         self.C_id = Classifier(num_classes=cfg.n_id_classes)
-        self.C_distr = Classifier(cfg.embedding_size)
+        self.C_distr = Classifier(cfg.embedding_size, num_classes=cfg.n_distr_classes)
 
     def forward(self, x):
         x = self.encoder(x)
 
-        f_G = x[:, : 512] * 1.0
-        f_A = x[:, 512 : 1024] * 1.0
-        f_R = x[:, 1024 : 1536] * 1.0
-        f_ID = x[:, 1536 : 2048] * 1.0
-        f_Joint = x * 1.0
+        f_G = x[:, : 512]
+        f_A = x[:, 512 : 1024]
+        f_R = x[:, 1024 : 1536]
+        f_ID = x[:, 1536 : 2048]
+        f_Joint = x.clone()
 
         r = torch.randperm(4)
-        f_Shuffled = x * 1.0
+        f_Shuffled = x.clone()
 
-        tmp1 = f_Shuffled[:, : 512] * 1.0
-        tmp2 = f_Shuffled[:, 512 : 1024] * 1.0
-        tmp3 = f_Shuffled[:, 1024 : 1536] * 1.0
-        tmp4 = f_Shuffled[:, 1536 : 2048] * 1.0
+        tmp1 = f_Shuffled[:, : 512]
+        tmp2 = f_Shuffled[:, 512 : 1024]
+        tmp3 = f_Shuffled[:, 1024 : 1536]
+        tmp4 = f_Shuffled[:, 1536 : 2048]
 
         f_Shuffled[:, (512 * r[0].item()) : (512 * (r[0].item() + 1))] = tmp1
         f_Shuffled[:, (512 * r[1].item()) : (512 * (r[1].item() + 1))] = tmp2

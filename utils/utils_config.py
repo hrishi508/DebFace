@@ -13,6 +13,7 @@ class ConfigParams():
         self.n_race_classes = int(cfg["n_race_classes"])
         self.n_age_classes = int(cfg["n_age_classes"])
         self.n_id_classes = int(cfg["n_id_classes"])
+        self.n_distr_classes = int(cfg["n_distr_classes"])
         self.sample_rate = int(cfg["sample_rate"])
         self.num_image = int(cfg["num_image"])
         self.warmup_step = int(cfg["warmup_step"])
