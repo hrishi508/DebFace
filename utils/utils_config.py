@@ -2,9 +2,7 @@ import configparser
 
 class ConfigParams():
     def __init__(self, cfg):
-        self.seed = int(cfg["seed"])
-        self.output = cfg["output"]
-        self.rec = cfg["rec"]
+        self.datasets_base_path = cfg["datasets_base_path"]
         self.batch_size = int(cfg["batch_size"])
         self.network = cfg["network"]
         self.embedding_size = int(cfg["embedding_size"])
@@ -16,15 +14,9 @@ class ConfigParams():
         self.n_distr_classes = int(cfg["n_distr_classes"])
         self.sample_rate = int(cfg["sample_rate"])
         self.num_image = int(cfg["num_image"])
-        self.warmup_step = int(cfg["warmup_step"])
-        self.total_step = int(cfg["total_step"])
         self.num_epoch = int(cfg["num_epoch"])
         self.lr = float(cfg["lr"])
-        self.resume = bool(cfg["resume"])
         self.val_targets = cfg["val_targets"]
-        self.frequent = int(cfg["frequent"])
-        self.verbose = int(cfg["verbose"])
-        self.save_all_states = bool(cfg["save_all_states"])
         self.device = cfg["device"]
         self.path = cfg["path"]
 
