@@ -16,4 +16,6 @@ config2.ini
 archives/
 __pycache__/
 datasets/
-errors.txt
+organizer_errors.txt
+cleaner_errors.txt
+filter_errors.txt

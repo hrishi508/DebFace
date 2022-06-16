@@ -19,6 +19,9 @@ class ConfigParams():
         self.val_targets = cfg["val_targets"]
         self.device = cfg["device"]
         self.path = cfg["path"]
+        self.width = int(cfg["width"])
+        self.height = int(cfg["height"])
+        self.num_img_filter = int(cfg["num_img_filter"])
 
 def get_config(config_file):
     config_obj = configparser.ConfigParser(inline_comment_prefixes="#")
