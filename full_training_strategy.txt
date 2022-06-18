@@ -1,0 +1,84 @@
+Define 1 optimizer (pass params of the whole model in that)
+
+1. calc all classification losses
+2. calc all adversarial losses
+3. sum adv losses in loss1
+4. sum classi losses in loss2
+5. optim.zerograd()
+6. Freeze all model params
+7. Unfreeze only encoder params
+(The effect of 6 and 7 is to freeze all model params except encoder part)
+8. loss1.backward(retain_graph = True)
+9. Unfreeze all model params
+10. loss2.backward()
+11. optim.step()
+
+
+Try this out on a smaller model as given in the pytorch discussion page
+https://discuss.pytorch.org/t/how-to-update-sequential-part-of-model-using-different-loss/40838
+inp -> A -> B -> out
+
+
+Verify
+------
+1. What I want to check is that, is this procedure mathematically correct?
+2. Instead of trying this on models, try this on equations and the manually differentiate and Verify
+3. refer to the dl course repo autograd lab
+
+
+Solution for simple example
+---------------------------
+class MyModel(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.a = torch.nn.Parameter(torch.tensor([1.0]), requires_grad = True)
+        self.b = torch.nn.Parameter(torch.tensor([2.0]), requires_grad = True)
+        self.c = torch.nn.Parameter(torch.tensor([3.0]), requires_grad = True)
+
+    def forward(self, x):
+        x = self.a*x
+        y = self.b + x
+        z = self.c + x
+        return y, z
+
+
+model = MyModel()
+
+def loss_fn(o, y):
+    return y - o
+
+# model.a.requires_grad = False
+optimizer1 =  torch.optim.Adam(model.parameters(), lr=0.1)
+o1, o2 = model(torch.tensor([5.0]))
+
+loss1 = loss_fn(o1, torch.tensor([7.0]))
+loss2 = loss_fn(o2, torch.tensor([7.0]))
+
+model.a.requires_grad = False
+loss1.backward(retain_graph=True)
+model.a.requires_grad = True
+loss2.backward()
+print(model.a.grad, model.b.grad, model.c.grad)
+
+
+Solution for my model
+---------------------
+optimizer =  torch.optim.Adam(model.parameters(), lr=0.1)
+optimizer.zero_grad()
+
+for param in model.parameters():
+        param.requires_grad = False
+
+for param in model.encoder.parameters():
+    param.requires_grad = True
+
+loss_adv.backward(retain_graph=True)
+
+for param in model.parameters():
+        param.requires_grad = True
+    
+loss_classi.backward()
+
+optimizer.step()
+
