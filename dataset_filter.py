@@ -11,6 +11,7 @@ class IMFDB_Filter():
     def __init__(self, cfg):
         print("Initializing the filter..")
         self.base_path = cfg.datasets_base_path
+        self.errors_path = self.base_path + "errors/"
         self.data_path = self.base_path + "IMFDB_cleaned/"
         self.target_path = self.base_path + "IMFDB_final/"
         self.img_path = self.target_path + "images/"
@@ -20,7 +21,6 @@ class IMFDB_Filter():
         self.img_files = []
         self.img_cnt = 0
         self.curr_idx = 0
-        self.err_file = open("filter_errors.txt", "w")
 
         # No. of images per subject filter
         self.num_img_filter = cfg.num_img_filter
@@ -53,9 +53,12 @@ class IMFDB_Filter():
 
         try:
             os.makedirs(self.img_path)
+            os.mkdir(self.errors_path)
 
         except:
             pass
+
+        self.err_file = open((self.errors_path + "filter_errors.txt"), "w")
 
     def filter(self):
         print("Please wait while I filter the dataset..")
@@ -72,9 +75,15 @@ class IMFDB_Filter():
 
                 for label in r1:
                                         
-                    # Handle no. of images per subject issue
                     self.tmp_id = int(label[self.id_index])
 
+                    # Handle ranimukerji gender mislabelling issue
+                    if self.tmp_id == 61:
+                        if label[self.gender_index] == '0':
+                            self.curr_idx += 1
+                            continue    
+
+                    # Handle no. of images per subject issue
                     if self.tmp_id in self.remove_id_dict.keys():
                         self.curr_idx += 1
                         continue

@@ -12,6 +12,7 @@ class IMFDB_Cleaner():
     def __init__(self, cfg):
         print("Initializing the cleaner..")
         self.base_path = cfg.datasets_base_path
+        self.errors_path = self.base_path + "errors/"
         self.data_path = self.base_path + "IMFDB_simplified/"
         self.target_path = self.base_path + "IMFDB_cleaned/"
         self.img_path = self.target_path + "images/"
@@ -21,7 +22,6 @@ class IMFDB_Cleaner():
         self.img_files = []
         self.img_cnt = 0
         self.curr_idx = 0
-        self.err_file = open("cleaner_errors.txt", "w")
 
         # Image width and height filter size
         self.height = cfg.height
@@ -64,9 +64,12 @@ class IMFDB_Cleaner():
 
         try:
             os.makedirs(self.img_path)
+            os.mkdir(self.errors_path)
 
         except:
             pass
+
+        self.err_file = open((self.errors_path + "cleaner_errors.txt"), "w")
 
     def clean(self):
         print("Please wait while I clean the dataset..")

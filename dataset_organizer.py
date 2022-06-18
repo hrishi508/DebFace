@@ -11,6 +11,7 @@ class IMFDB_Organizer():
     def __init__(self, cfg):
         print("Initializing the organizer..")
         self.base_path = cfg.datasets_base_path
+        self.errors_path = self.base_path + "errors/"
         self.data_path = self.base_path + "IMFDB/"
         self.target_path = self.base_path + "IMFDB_simplified/"
         self.img_path = self.target_path + "images/"
@@ -20,7 +21,6 @@ class IMFDB_Organizer():
         self.img_files = []
         self.label_files = []
         self.img_cnt = 0
-        self.err_file = open("organizer_errors.txt", "w")
 
         # class mapping dictionaries
         self.id_cnt = 0
@@ -52,9 +52,12 @@ class IMFDB_Organizer():
 
         try:
             os.makedirs(self.img_path)
+            os.mkdir(self.errors_path)
 
         except:
             pass
+        
+        self.err_file = open((self.errors_path + "organizer_errors.txt"), "w")
 
     def organize(self):
         print("Please wait while I organize the dataset..")
