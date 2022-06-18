@@ -16,12 +16,18 @@ class ConfigParams():
         self.num_image = int(cfg["num_image"])
         self.num_epoch = int(cfg["num_epoch"])
         self.lr = float(cfg["lr"])
-        self.val_targets = cfg["val_targets"]
         self.device = cfg["device"]
         self.path = cfg["path"]
         self.width = int(cfg["width"])
         self.height = int(cfg["height"])
         self.num_img_filter = int(cfg["num_img_filter"])
+        self.train_dataset_img_dir = cfg["train_dataset_img_dir"]
+        self.train_dataset_labels = cfg["train_dataset_labels"]
+        self.test_dataset_img_dir = cfg["test_dataset_img_dir"]
+        self.test_dataset_labels = cfg["test_dataset_labels"]
+        self.base_path = cfg["base_path"]
+        self.val_dataset_size = int(cfg["val_dataset_size"])
+
 
 def get_config(config_file):
     config_obj = configparser.ConfigParser(inline_comment_prefixes="#")
