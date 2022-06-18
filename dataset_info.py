@@ -1,7 +1,4 @@
-import os
 import csv
-import glob
-import shutil
 import argparse
 
 from utils.utils_config import get_config
