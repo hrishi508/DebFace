@@ -1,20 +1,66 @@
+import os
 import argparse
+import numpy as np
+import pandas as pd
+from PIL import Image
+import matplotlib.pyplot as plt
 
 import torch
 from torch import nn
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 # from torchsummary import summary
-from torchviz import make_dot
+# from torchviz import make_dot
+from torchvision import transforms
 
 from utils.utils_config import get_config
 
-from archives.debface_with_adversarial_without_race_v1 import DebFace
+from backbones.debface import DebFaceWithoutRace
 # from backbones.am_softmax import Am_softmax
 from utils.utils_config import ConfigParams
 
+class CustomDataset(Dataset):
+    def __init__(self, annotations_file, img_dir, transform=None, target_transform=None):
+        self.img_labels = pd.read_csv(annotations_file)
+        self.img_dir = img_dir
+        self.transform = transform
+        self.target_transform = target_transform
+
+    def __len__(self):
+        return len(self.img_labels)
+
+    def __getitem__(self, idx):
+        img_path = os.path.join(self.img_dir, self.img_labels.iloc[idx, 0])
+        image = Image.open(img_path)
+        label = self.img_labels.iloc[idx, 1:].to_numpy(dtype='uint8')
+
+        if self.transform:
+            image = self.transform(image)
+
+        if self.target_transform:
+            label = self.target_transform(label)
+
+        return image, label    
+
+def imshow(img):
+    plt.imshow(np.array(img).transpose(1, 2, 0))
+    plt.xticks([])
+    plt.yticks([])
+    plt.show()
+
+def getTansform():
+    transform = transforms.Compose([transforms.ToTensor(),
+                                    transforms.Resize((112, 112)),
+                                    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+                                    ])
+
+    return transform
+
+def loadData():
+    pass
+
 def train(dataloader, model, loss_fn_arr, train_loss_arr, optimizer, cfg):
-    # size = len(dataloader.dataset)
-    size = 100 # size of dataset
+    size = len(dataloader.dataset)
+    # size = 100 # size of dataset
     num_batches = len(dataloader)
     batch_size = int(size/num_batches)
     
@@ -29,16 +75,16 @@ def train(dataloader, model, loss_fn_arr, train_loss_arr, optimizer, cfg):
         out_G1, out_G2, out_G3, out_A1, out_A2, out_A3, out_ID1, out_ID2, out_ID3, out_Distr1, out_Distr2 = model(X)
 
         y_G1 = y[:, 0].clone()
-        y_G2 = torch.full(y_G1.shape, 1)
-        y_G3 = torch.full(y_G1.shape, 1)
+        y_A1 = torch.full(y_G1.shape, 1)
+        y_ID1 = torch.full(y_G1.shape, 1)
 
-        y_A1 = y[:, 1].clone()
-        y_A2 = torch.full(y_A1.shape, 1)
-        y_A3 = torch.full(y_A1.shape, 1)
+        y_A2  = y[:, 1].clone()
+        y_G2  = torch.full(y_A2.shape, 1)
+        y_ID2 = torch.full(y_A2.shape, 1)
 
-        y_ID1 = y[:, 2].clone()
-        y_ID2 = torch.full(y_ID1.shape, 1)
-        y_ID3 = torch.full(y_ID1.shape, 1)
+        y_ID3  = y[:, 2].clone()
+        y_G3  = torch.full(y_ID3.shape, 1)
+        y_A3 = torch.full(y_ID3.shape, 1)
 
         y_Distr11 = torch.tensor([1 for i in range(batch_size)])
         y_Distr12 = torch.tensor([1 for i in range(batch_size)])
@@ -48,35 +94,35 @@ def train(dataloader, model, loss_fn_arr, train_loss_arr, optimizer, cfg):
 
         # Classification losses
         loss_G1 = loss_fn_arr[0](out_G1, y_G1)
-        loss_A1 = loss_fn_arr[0](out_A1, y_A1)
-        loss_ID1 = loss_fn_arr[0](out_ID1, y_ID1)
+        loss_A2 = loss_fn_arr[0](out_A2, y_A2)
+        loss_ID3 = loss_fn_arr[0](out_ID3, y_ID3)
         loss_Distr11 = loss_fn_arr[0](out_Distr1, y_Distr11)
         loss_Distr21 = loss_fn_arr[0](out_Distr2, y_Distr21)
 
-        classification_loss = loss_G1 + loss_A1 + loss_ID1 + loss_Distr11 + loss_Distr21
+        classification_loss = loss_G1 + loss_A2 + loss_ID3 + loss_Distr11 + loss_Distr21
         train_loss += classification_loss.item()
 
         # Adversarial losses
-        loss_G2 = loss_fn_arr[1](out_G2, y_G2)
-        loss_G3 = loss_fn_arr[1](out_G3, y_G3)
+        loss_A1 = loss_fn_arr[1](out_A1, y_A1)
+        loss_ID1 = loss_fn_arr[1](out_ID1, y_ID1)
 
-        loss_A2 = loss_fn_arr[2](out_A2, y_A2)
-        loss_A3 = loss_fn_arr[2](out_A3, y_A3)
+        loss_G2 = loss_fn_arr[2](out_G2, y_G2)
+        loss_ID2 = loss_fn_arr[2](out_ID2, y_ID2)
 
-        loss_ID2 = loss_fn_arr[3](out_ID2, y_ID2)
-        loss_ID3 = loss_fn_arr[3](out_ID3, y_ID3)
+        loss_G3 = loss_fn_arr[3](out_G3, y_G3)
+        loss_A3 = loss_fn_arr[3](out_A3, y_A3)
 
         loss_Distr12 = loss_fn_arr[4](out_Distr1, y_Distr12)
         loss_Distr22 = loss_fn_arr[4](out_Distr2, y_Distr22)
 
-        adversarial_loss = loss_G2 + loss_G3 + loss_A2 + loss_A3 + loss_ID2 + loss_ID3 + loss_Distr12 + loss_Distr22
+        adversarial_loss = loss_G2 + loss_G3 + loss_A1 + loss_A3 + loss_ID1 + loss_ID2 + loss_Distr12 + loss_Distr22
         train_loss += adversarial_loss.item()
 
         # Calculate classifier accuracies and total loss per batch
         with torch.no_grad():
             correct_G += (out_G1.argmax(1) == y_G1).type(torch.float).sum().item()
-            correct_A += (out_A1.argmax(1) == y_A1).type(torch.float).sum().item()
-            correct_ID += (out_ID1.argmax(1) == y_ID1).type(torch.float).sum().item()            
+            correct_A += (out_A2.argmax(1) == y_A2).type(torch.float).sum().item()
+            correct_ID += (out_ID3.argmax(1) == y_ID3).type(torch.float).sum().item()            
             correct_Distr += (out_Distr1.argmax(1) == y_Distr11).type(torch.float).sum().item()           
             correct_Distr += (out_Distr2.argmax(1) == y_Distr21).type(torch.float).sum().item()
             
@@ -118,8 +164,8 @@ def train(dataloader, model, loss_fn_arr, train_loss_arr, optimizer, cfg):
     train_loss_arr.append(train_loss)
 
 def test(dataloader, model, loss_fn_arr, test_loss_arr, cfg):
-    # size = len(dataloader.dataset)
-    size = 100 # size of dataset
+    size = len(dataloader.dataset)
+    # size = 100 # size of dataset
     num_batches = len(dataloader)
     batch_size = int(size/num_batches)
     test_loss = 0
@@ -132,16 +178,16 @@ def test(dataloader, model, loss_fn_arr, test_loss_arr, cfg):
             out_G1, out_G2, out_G3, out_A1, out_A2, out_A3, out_ID1, out_ID2, out_ID3, out_Distr1, out_Distr2 = model(X)
 
             y_G1 = y[:, 0].clone()
-            y_G2 = torch.full(y_G1.shape, 1)
-            y_G3 = torch.full(y_G1.shape, 1)
+            y_A1 = torch.full(y_G1.shape, 1)
+            y_ID1 = torch.full(y_G1.shape, 1)
 
-            y_A1 = y[:, 1].clone()
-            y_A2 = torch.full(y_A1.shape, 1)
-            y_A3 = torch.full(y_A1.shape, 1)
+            y_A2  = y[:, 1].clone()
+            y_G2  = torch.full(y_A2.shape, 1)
+            y_ID2 = torch.full(y_A2.shape, 1)
 
-            y_ID1 = y[:, 2].clone()
-            y_ID2 = torch.full(y_ID1.shape, 1)
-            y_ID3 = torch.full(y_ID1.shape, 1)
+            y_ID3  = y[:, 2].clone()
+            y_G3  = torch.full(y_ID3.shape, 1)
+            y_A3 = torch.full(y_ID3.shape, 1)
 
             y_Distr11 = torch.tensor([1 for i in range(batch_size)])
             y_Distr12 = torch.tensor([1 for i in range(batch_size)])
@@ -151,34 +197,34 @@ def test(dataloader, model, loss_fn_arr, test_loss_arr, cfg):
 
             # Classification losses
             loss_G1 = loss_fn_arr[0](out_G1, y_G1)
-            loss_A1 = loss_fn_arr[0](out_A1, y_A1)
-            loss_ID1 = loss_fn_arr[0](out_ID1, y_ID1)
+            loss_A2 = loss_fn_arr[0](out_A2, y_A2)
+            loss_ID3 = loss_fn_arr[0](out_ID3, y_ID3)
             loss_Distr11 = loss_fn_arr[0](out_Distr1, y_Distr11)
             loss_Distr21 = loss_fn_arr[0](out_Distr2, y_Distr21)
 
-            classification_loss = loss_G1 + loss_A1 + loss_ID1 + loss_Distr11 + loss_Distr21
+            classification_loss = loss_G1 + loss_A2 + loss_ID3 + loss_Distr11 + loss_Distr21
             test_loss += classification_loss.item()
 
             # Adversarial losses
-            loss_G2 = loss_fn_arr[1](out_G2, y_G2)
-            loss_G3 = loss_fn_arr[1](out_G3, y_G3)
+            loss_A1 = loss_fn_arr[1](out_A1, y_A1)
+            loss_ID1 = loss_fn_arr[1](out_ID1, y_ID1)
 
-            loss_A2 = loss_fn_arr[2](out_A2, y_A2)
-            loss_A3 = loss_fn_arr[2](out_A3, y_A3)
+            loss_G2 = loss_fn_arr[2](out_G2, y_G2)
+            loss_ID2 = loss_fn_arr[2](out_ID2, y_ID2)
 
-            loss_ID2 = loss_fn_arr[3](out_ID2, y_ID2)
-            loss_ID3 = loss_fn_arr[3](out_ID3, y_ID3)
+            loss_G3 = loss_fn_arr[3](out_G3, y_G3)
+            loss_A3 = loss_fn_arr[3](out_A3, y_A3)
 
             loss_Distr12 = loss_fn_arr[4](out_Distr1, y_Distr12)
             loss_Distr22 = loss_fn_arr[4](out_Distr2, y_Distr22)
 
-            adversarial_loss = loss_G2 + loss_G3 + loss_A2 + loss_A3 + loss_ID2 + loss_ID3 + loss_Distr12 + loss_Distr22
+            adversarial_loss = loss_G2 + loss_G3 + loss_A1 + loss_A3 + loss_ID1 + loss_ID2 + loss_Distr12 + loss_Distr22
             test_loss += adversarial_loss.item()
 
             # Calculate classifier accuracies
             correct_G += (out_G1.argmax(1) == y_G1).type(torch.float).sum().item()
-            correct_A += (out_A1.argmax(1) == y_A1).type(torch.float).sum().item()
-            correct_ID += (out_ID1.argmax(1) == y_ID1).type(torch.float).sum().item()            
+            correct_A += (out_A2.argmax(1) == y_A2).type(torch.float).sum().item()
+            correct_ID += (out_ID3.argmax(1) == y_ID3).type(torch.float).sum().item()            
             correct_Distr += (out_Distr1.argmax(1) == y_Distr11).type(torch.float).sum().item()           
             correct_Distr += (out_Distr2.argmax(1) == y_Distr21).type(torch.float).sum().item()
 
@@ -197,7 +243,43 @@ def main(args):
     str_type_cfg = get_config(args.config)
     cfg = ConfigParams(str_type_cfg)
 
-    model = DebFace(cfg).to(cfg.device)
+    # create train dataset
+    train_data = CustomDataset(cfg.train_dataset_labels, cfg.train_dataset_img_dir, transform=getTansform())
+
+    # visualize train data for debugging
+    # img, label = train_data[4888]
+    # print(label, type(label))
+    # imshow(img)
+
+    # create test split
+    train_data, test_data = torch.utils.data.random_split(train_data, [len(train_data) - cfg.val_dataset_size, cfg.val_dataset_size])
+    
+    # visualize test data for debugging
+    # img, label = test_data[500]
+    # print(label, type(label))
+    # imshow(img)
+
+    # create train dataloader
+    train_loader = DataLoader(train_data, batch_size=cfg.batch_size, shuffle=True)
+
+    # visualize train dataloader next image for debugging
+    # while True:
+    #     tmp = next(iter(train_loader))
+    #     imshow(tmp[0][1])
+    #     print(tmp[0].shape, type(tmp[0]))
+    #     print(tmp[1].shape, type(tmp[1]))
+
+    # create test dataloader
+    test_loader = DataLoader(test_data, batch_size=cfg.batch_size, shuffle=True)
+
+    # visualize test dataloader next image for debugging
+    # while True:
+    #     tmp = next(iter(test_loader))
+    #     imshow(tmp[0][1])
+    #     print(tmp[0].shape, type(tmp[0]))
+    #     print(tmp[1].shape, type(tmp[1]))
+
+    model = DebFaceWithoutRace(cfg).to(cfg.device)
     # summary(model, (3, 112, 112))
 
     weight_G = torch.tensor([(1/cfg.n_gender_classes) for i in range(cfg.n_gender_classes)])
@@ -207,27 +289,33 @@ def main(args):
 
     loss_fn_arr = [nn.CrossEntropyLoss(), nn.CrossEntropyLoss(weight=weight_G), nn.CrossEntropyLoss(weight=weight_A), nn.CrossEntropyLoss(weight=weight_ID), nn.CrossEntropyLoss(weight=weight_Distr)]
 
-    optimizer = torch.optim.SGD(model.parameters(), lr=cfg.lr)
+    if cfg.optimizer == 'sgd':
+        optimizer = torch.optim.SGD(model.parameters(), lr=cfg.lr)
+
+    elif cfg.optimizer == 'adam':
+        optimizer = torch.optim.Adam(model.parameters(), lr=cfg.lr)
 
     train_loss_arr = []
     test_loss_arr = []
 
     # creating a random dataset (same shape as the facial dataset we will be using) for testing the code logic
-    dataloader = []
-    for i in range(10):
-        X_tmp = torch.randn((10, 3, 112, 112))
-        # y = torch.tensor([[0, 1, 2, 0], [0, 1, 2, 0], [0, 1, 2, 0]])
-        # assuming 4 classes each for gender, age and id
-        y_tmp = torch.randint(4, (10, 3))
-        dataloader.append((X_tmp, y_tmp))
+    # dataloader = []
+    # for i in range(10):
+    #     X_tmp = torch.randn((10, 3, 112, 112))
+    #     # y = torch.tensor([[0, 1, 0], [0, 1, 0], [0, 1, 0]])
+    #     # assuming 4 classes each for gender, age and id
+    #     y_tmp = torch.randint(2, (10, 3))
+    #     dataloader.append((X_tmp, y_tmp))
 
     epochs = cfg.num_epoch
     for t in range(epochs):
         print(f"Epoch {t+1}\n-------------------------------")
-        # train(train_dataloader, model, loss_fn_arr, train_loss_arr, optimizer, cfg)
-        train(dataloader, model, loss_fn_arr, train_loss_arr, optimizer, cfg)
-        # test(test_dataloader, model, loss_fn_arr, test_loss_arr, cfg)
-        test(dataloader, model, loss_fn_arr, test_loss_arr, cfg)
+        train(train_loader, model, loss_fn_arr, train_loss_arr, optimizer, cfg)
+        test(test_loader, model, loss_fn_arr, test_loss_arr, cfg)
+
+        # code used for testing model logic using random dataset created above
+        # train(dataloader, model, loss_fn_arr, train_loss_arr, optimizer, cfg)
+        # test(dataloader, model, loss_fn_arr, test_loss_arr, cfg)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
