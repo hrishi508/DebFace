@@ -111,17 +111,19 @@ So, for training this model, I went with a dataset which partially satisfies the
 
 The original dataset has many incomplete labels and various mismatches among the labels and the corresponding images. It also has many extra labels that are irrelevant for training the model (the only ones we require are ID, Gender, Age and Race).
 
-So, I first partly cleaned the dataset manually ([available here]()), then I designed a few custom scripts to automate the cleaning, flitering and transformation of the IMFDB dataset so that it can be directly used for training the [DebFaceWithoutRace](#model-definition-scripts) model. I have uploaded the final cleaned version of the dataset [here]().
+So, I first partly cleaned the dataset manually ([available here](https://drive.google.com/drive/folders/1QHmbNRW5kDv8l7MjCw3iFcaOfRWQ8B-y?usp=sharing)), then I designed a few custom scripts to automate the cleaning, flitering and transformation of the IMFDB dataset so that it can be directly used for training the [DebFaceWithoutRace](#model-definition-scripts) model. I have uploaded the final cleaned version of the dataset [here](https://drive.google.com/drive/folders/13oCfNzDiQTYgUsb9w9VJO5yf5xLzcF2U?usp=sharing).
 
-Now, you can either choose to download the [final dataset]() and directly train the DebFace model on it, or you can use my custom-made scripts on the [manually cleaned version]() of to generate your dataset for training.
+Now, you can either choose to download the [final dataset](https://drive.google.com/drive/folders/13oCfNzDiQTYgUsb9w9VJO5yf5xLzcF2U?usp=sharing) and directly train the DebFace model on it, or you can use my custom-made scripts on the [manually cleaned version](https://drive.google.com/drive/folders/1QHmbNRW5kDv8l7MjCw3iFcaOfRWQ8B-y?usp=sharing) of to generate your dataset for training.
+
+__NOTE: If you download the dataset, please create a 'datasets/' folder in the root directory of this repository that you had cloned earlier in the [environment setup](#environment-setup) section and move this downloaded dataset folder 'IMFDB_final/' into the 'datasets/' folder for the training scripts to work smoothly__
 
 __WARNING: DO NOT RUN THESE SCRIPTS ON THE ORIGINAL IMFDB DATASET!__ 
 
-__They will end up throwing a lot of errors due to the mislabelled samples and mismatches. Only run in this script on the manually cleaned version that I have provided [here]().__
+__They will end up throwing a lot of errors due to the mislabelled samples and mismatches. Only run in this script on the manually cleaned version that I have provided [here](https://drive.google.com/drive/folders/1QHmbNRW5kDv8l7MjCw3iFcaOfRWQ8B-y?usp=sharing).__
 
 Following are the steps to generate your own data from the manually cleaned IMFDB using the custom-made scripts:
 1. After cloning this repository, navigate to the root (i.e. DebFace/) and create a 'datasets/' folder there.
-2. Download the manually cleaned IMFDB dataset from [here]() and move it into the newly created 'datasets/' folder.
+2. Download the manually cleaned IMFDB dataset from [here](https://drive.google.com/drive/folders/1QHmbNRW5kDv8l7MjCw3iFcaOfRWQ8B-y?usp=sharing) and move it into the newly created 'datasets/' folder.
 3. Set the arguments in the [config.ini](/config.ini) appropriately
 4. Navigate to the root directory of the repository, and run the custom scripts in succession using the commands given below:
 
@@ -158,7 +160,7 @@ __NOTE: As already mentioned earlier in the [datasets](#datasets) section, this 
 
 __NOTE: If you want to train the model on a dataset which has all the labels (satisfies all the constraints mentioned in the [datasets](#datasets) section), please use [train.py](/train.py) for the same.__
 
-Following are the steps to train the DebFace model on the [final dataset]() that you either already downloaded or genereated by following the steps in the [datasets](#datasets) section:
+Following are the steps to train the DebFace model on the [final dataset](https://drive.google.com/drive/folders/13oCfNzDiQTYgUsb9w9VJO5yf5xLzcF2U?usp=sharing) that you either already downloaded or genereated by following the steps in the [datasets](#datasets) section:
 1. Navigate to the root directory of the repository, and run the [dataset_splitter.py](/dataset_splitter.py) that I have provided to split the final dataset into Train and Test using the command given below:
 
         python3 dataset_splitter.py FULL-PATH-TO-THE-CONFIG-FILE
