@@ -119,7 +119,7 @@ __WARNING: DO NOT RUN THESE SCRIPTS ON THE ORIGINAL IMFDB DATASET!__
 
 __They will end up throwing a lot of errors due to the mislabelled samples and mismatches. Only run in this script on the manually cleaned version that I have provided [here]().__
 
-The following are the steps to generate your own data from the manually cleaned IMFDB using the custom-made scripts:
+Following are the steps to generate your own data from the manually cleaned IMFDB using the custom-made scripts:
 1. After cloning this repository, navigate to the root (i.e. DebFace/) and create a 'datasets/' folder there.
 2. Download the manually cleaned IMFDB dataset from [here]() and move it into the newly created 'datasets/' folder.
 3. Set the arguments in the [config.ini](/config.ini) appropriately
@@ -152,6 +152,25 @@ The following scripts have been created by me from scratch to provide a seamless
 3. [debface.py](/backbones/debface.py) - This script contains the 'DebFace' class which basically initializes the encoder and all the demographic and ID classifiers and integrates them seamlessly. __NOTE: I have also provided a 'DebFaceWithoutRace' class, this is the same model as above but excluding the 'race' classifier and all its connection. This is the class that has been used in this project for reasons that will be covered in the section below.__
 
 # Training the model
+I have provided two custom scripts [train.py](/train.py) and [train_without_race.py](/train_without_race.py) to make the training process seamless and make the iteration of the various hyperparameters easier.
+
+__NOTE: As already mentioned earlier in the [datasets](#datasets) section, this project is using the IMFDB dataset for model training which does not contain race labels. Thus, this project uses the [train_without_race.py](/train_without_race.py) to train the model which makes use of the 'DebFaceWithoutRace' class in the [debface.py](/backbones/debface.py).__
+
+__NOTE: If you want to train the model on a dataset which has all the labels (satisfies all the constraints mentioned in the [datasets](#datasets) section), please use [train.py](/train.py) for the same.__
+
+Following are the steps to train the DebFace model on the [final dataset]() that you either already downloaded or genereated by following the steps in the [datasets](#datasets) section:
+1. Navigate to the root directory of the repository, and run the [dataset_splitter.py](/dataset_splitter.py) that I have provided to split the final dataset into Train and Test using the command given below:
+
+        python3 dataset_splitter.py FULL-PATH-TO-THE-CONFIG-FILE
+
+Running the above will generate 'Train/' and 'Test/' directories in your 'datasets/' directory that you had created while following the steps in the [dataset](#datasets) section.
+
+2. Set the arguments in the [config.ini](/config.ini) appropriately
+4. You're set to start training the model now! Run the command below to begin the training:
+
+        python3 train_without_race.py FULL-PATH-TO-THE-CONFIG-FILE
+
+__NOTE: Replace the FULL-PATH-TO-THE-CONFIG-FILE with the path of the [config.ini](/config.ini) file enclosed in "". For example, for my device, I set the FULL-PATH-TO-THE-CONFIG-FILE to "/home/hrishi/Repos/DebFace/config.ini".__
 
 <!-- # Running the model
 
