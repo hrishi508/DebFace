@@ -13,11 +13,15 @@ class ConfigParams():
         self.n_id_classes = int(cfg["n_id_classes"])
         self.n_distr_classes = int(cfg["n_distr_classes"])
         self.sample_rate = int(cfg["sample_rate"])
-        self.num_image = int(cfg["num_image"])
         self.num_epoch = int(cfg["num_epoch"])
         self.lr = float(cfg["lr"])
+        self.momentum = float(cfg["momentum"])
+        self.weight_decay = float(cfg["weight_decay"])
+        self.lr_decay_rate = float(cfg["lr_decay_rate"])
+        self.lr_scheduler = bool(cfg["lr_scheduler"])
+        self.lr_decay_milestones = [int(x) for x in cfg["lr_decay_milestones"].split(",")]
         self.device = cfg["device"]
-        self.path = cfg["path"]
+        self.model_weights_dir = cfg["model_weights_dir"]
         self.width = int(cfg["width"])
         self.height = int(cfg["height"])
         self.num_img_filter = int(cfg["num_img_filter"])
@@ -27,7 +31,7 @@ class ConfigParams():
         self.test_dataset_labels = cfg["test_dataset_labels"]
         self.base_path = cfg["base_path"]
         self.val_dataset_size = int(cfg["val_dataset_size"])
-
+        self.save_model_weights_every = int(cfg["save_model_weights_every"])
 
 def get_config(config_file):
     config_obj = configparser.ConfigParser(inline_comment_prefixes="#")
