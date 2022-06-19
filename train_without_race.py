@@ -3,6 +3,7 @@ import argparse
 import numpy as np
 import pandas as pd
 from PIL import Image
+from datetime import datetime
 import matplotlib.pyplot as plt
 
 import torch
@@ -58,11 +59,11 @@ def getTansform():
 def loadData():
     pass
 
-def train(dataloader, model, loss_fn_arr, train_loss_arr, optimizer, cfg):
+def train(dataloader, model, loss_fn_arr, train_loss_arr, optimizer, scheduler, cfg):
     size = len(dataloader.dataset)
     # size = 100 # size of dataset
     num_batches = len(dataloader)
-    batch_size = int(size/num_batches)
+    batch_size = cfg.batch_size
     
     model.train()
     train_loss = 0
@@ -153,13 +154,14 @@ def train(dataloader, model, loss_fn_arr, train_loss_arr, optimizer, cfg):
         classification_loss.backward()
         optimizer.step()
 
+    if cfg.lr_scheduler:
+        scheduler.step()
     train_loss /= num_batches
     correct_G /= size
     correct_A /= size
     correct_ID /= size
     correct_Distr /= (size * 2)
     print(f"\nTraining - Accuracy_G: {(100*correct_G):>0.1f}%, Accuracy_A: {(100*correct_A):>0.1f}%, Accuracy_ID: {(100*correct_ID):>0.1f}%, Accuracy_Distr: {(100*correct_Distr):>0.1f}%, Avg loss: {train_loss:>8f} \n")
-    # # torch.save(model.state_dict(), cfg.path +"run1.pth")
 
     train_loss_arr.append(train_loss)
 
@@ -167,7 +169,7 @@ def test(dataloader, model, loss_fn_arr, test_loss_arr, cfg):
     size = len(dataloader.dataset)
     # size = 100 # size of dataset
     num_batches = len(dataloader)
-    batch_size = int(size/num_batches)
+    batch_size = cfg.batch_size
     test_loss = 0
     correct_G, correct_A, correct_ID, correct_Distr = 0, 0, 0, 0
 
@@ -290,10 +292,20 @@ def main(args):
     loss_fn_arr = [nn.CrossEntropyLoss(), nn.CrossEntropyLoss(weight=weight_G), nn.CrossEntropyLoss(weight=weight_A), nn.CrossEntropyLoss(weight=weight_ID), nn.CrossEntropyLoss(weight=weight_Distr)]
 
     if cfg.optimizer == 'sgd':
-        optimizer = torch.optim.SGD(model.parameters(), lr=cfg.lr)
+        optimizer = torch.optim.SGD(model.parameters(), lr=cfg.lr, momentum=cfg.momentum, weight_decay=cfg.weight_decay)
 
     elif cfg.optimizer == 'adam':
-        optimizer = torch.optim.Adam(model.parameters(), lr=cfg.lr)
+        optimizer = torch.optim.Adam(model.parameters(), lr=cfg.lr, weight_decay=cfg.weight_decay)
+
+    else:
+        print("Error while parsing optimizer in config file! Please choose from the supported list of optimizers (sgd or adam) and enter the name correctly in the config file.")
+        quit()
+
+    if cfg.lr_scheduler:
+        scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, cfg.lr_decay_milestones)
+
+    else:
+        scheduler = None
 
     train_loss_arr = []
     test_loss_arr = []
@@ -308,14 +320,26 @@ def main(args):
     #     dataloader.append((X_tmp, y_tmp))
 
     epochs = cfg.num_epoch
+
+    try:
+        os.makedirs(cfg.model_weights_dir)
+
+    except:
+        pass
+
     for t in range(epochs):
         print(f"Epoch {t+1}\n-------------------------------")
-        train(train_loader, model, loss_fn_arr, train_loss_arr, optimizer, cfg)
+        train(train_loader, model, loss_fn_arr, train_loss_arr, optimizer, scheduler, cfg)
         test(test_loader, model, loss_fn_arr, test_loss_arr, cfg)
 
         # code used for testing model logic using random dataset created above
         # train(dataloader, model, loss_fn_arr, train_loss_arr, optimizer, cfg)
         # test(dataloader, model, loss_fn_arr, test_loss_arr, cfg)
+
+        if cfg.save_model_weights_every > 0 and (t + 1)%cfg.save_model_weights_every == 0:
+            now = datetime.now()
+            dt_string = now.strftime("%d-%m-%Y_%H:%M:%S_")
+            torch.save(model.state_dict(), cfg.model_weights_dir + dt_string + "weights.pth")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
