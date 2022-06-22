@@ -20,6 +20,7 @@ class IMFDB_Organizer():
         self.txt_postfix = "**/*.txt"
         self.img_files = []
         self.label_files = []
+        self.curr_idx = 0
         self.img_cnt = 0
 
         # class mapping dictionaries
@@ -30,10 +31,9 @@ class IMFDB_Organizer():
             "FEMALE": 1
         })
         self.age_dict = dict({
-            "CHILD": 0,
-            "YOUNG": 1,
-            "MIDDLE": 2,
-            "OLD": 3
+            "YOUNG": 0,
+            "MIDDLE": 1,
+            "OLD": 2
         })
         
         # label initializers
@@ -104,7 +104,7 @@ class IMFDB_Organizer():
                         if label == [] or label == ['\ufeff']:
                             continue
 
-                        self.tmp_img_name = self.img_files[self.img_cnt].split('/')[-1]
+                        self.tmp_img_name = self.img_files[self.curr_idx].split('/')[-1]
                         
                         if self.tmp_img_name != label[self.img_name_index]:
                             # print(self.tmp_img_name, self.img_name_index)
@@ -123,13 +123,17 @@ class IMFDB_Organizer():
                                 self.tmp_id = self.id_dict[label[self.id_index].lower()]
 
                             except:
-                                self.img_cnt += 1
+                                self.curr_idx += 1
                                 continue
 
                             self.tmp_gender = self.gender_dict[label[self.gender_index]]
 
                             if label[self.age_index] == "MIDDDLE":
                                 self.tmp_age = self.age_dict["MIDDLE"]
+
+                            elif label[self.age_index] == "CHILD":
+                                self.curr_idx += 1
+                                continue
 
                             else:
                                 self.tmp_age = self.age_dict[label[self.age_index]]
@@ -145,9 +149,10 @@ class IMFDB_Organizer():
                         self.tmp_label = [self.tmp_img_name, self.tmp_gender, self.tmp_age, self.tmp_id]
 
                         w1.writerow(self.tmp_label)
-                        shutil.copyfile(self.img_files[self.img_cnt], (self.img_path + self.tmp_img_name))
+                        shutil.copyfile(self.img_files[self.curr_idx], (self.img_path + self.tmp_img_name))
 
                         self.img_cnt += 1
+                        self.curr_idx += 1
 
                 f2.close()        
         f1.close()

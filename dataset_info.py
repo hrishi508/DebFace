@@ -87,10 +87,9 @@ class IMFDB_Info():
         self.info_file.write(f"Total no. of subjects: {len(self.id_cnt_dict)}\n\n")
         self.info_file.write(f"No. of male subjects: {len(self.gender_info_dict['0'])}\n")
         self.info_file.write(f"No. of female subjects: {len(self.gender_info_dict['1'])}\n\n")
-        self.info_file.write(f"No. of 'CHILD' subjects: {len(self.age_info_dict['0'])}\n")
-        self.info_file.write(f"No. of 'YOUNG' subjects: {len(self.age_info_dict['1'])}\n")
-        self.info_file.write(f"No. of 'MIDDLE' subjects: {len(self.age_info_dict['2'])}\n")
-        self.info_file.write(f"No. of 'OLD' subjects: {len(self.age_info_dict['3'])}\n\n")
+        self.info_file.write(f"No. of 'YOUNG' subjects: {len(self.age_info_dict['0'])}\n")
+        self.info_file.write(f"No. of 'MIDDLE' subjects: {len(self.age_info_dict['1'])}\n")
+        self.info_file.write(f"No. of 'OLD' subjects: {len(self.age_info_dict['2'])}\n\n")
         self.info_file.write(f"Image Count distribution by subjects (key is subject ID)\n")
         self.info_file.write(f"--------------------------------------------------------\n\n")
         self.info_file.write(f"{self.id_cnt_dict}\n\n")
@@ -101,7 +100,7 @@ class IMFDB_Info():
         self.info_file.write(f"----------------------------------------------------------------------------\n\n")
         self.info_file.write(f"{self.age_info_dict}\n\n")
         
-        print("Done! All the information logged into 'dataset_info.txt'.")
+        print("Done! All the information logged into 'IMFDB_final_info.txt'.")
 
 if __name__=="__main__":
     
