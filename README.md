@@ -111,9 +111,9 @@ So, for training this model, I went with a dataset which partially satisfies the
 
 The original dataset has many incomplete labels and various mismatches among the labels and the corresponding images. It also has many extra labels that are irrelevant for training the model (the only ones we require are ID, Gender, Age and Race).
 
-So, I first partly cleaned the dataset manually ([available here](https://drive.google.com/drive/folders/1QHmbNRW5kDv8l7MjCw3iFcaOfRWQ8B-y?usp=sharing)), then I designed a few custom scripts to automate the cleaning, flitering and transformation of the IMFDB dataset so that it can be directly used for training the [DebFaceWithoutRace](#model-definition-scripts) model. I have uploaded the final cleaned version of the dataset [here](https://drive.google.com/drive/folders/13oCfNzDiQTYgUsb9w9VJO5yf5xLzcF2U?usp=sharing).
+So, I first partly cleaned the dataset manually ([available here](https://drive.google.com/drive/folders/1QHmbNRW5kDv8l7MjCw3iFcaOfRWQ8B-y?usp=sharing)), then I designed a few custom scripts to automate the cleaning, flitering and transformation of the IMFDB dataset so that it can be directly used for training the [DebFaceWithoutRace](#model-definition-scripts) model. I have uploaded the final cleaned version of the dataset [here](https://drive.google.com/drive/folders/1sJPbiHCtD1fyeK_dmXeIJaTO7zwiDfYt?usp=sharing).
 
-Now, you can either choose to download the [final dataset](https://drive.google.com/drive/folders/13oCfNzDiQTYgUsb9w9VJO5yf5xLzcF2U?usp=sharing) and directly train the DebFace model on it, or you can use my custom-made scripts on the [manually cleaned version](https://drive.google.com/drive/folders/1QHmbNRW5kDv8l7MjCw3iFcaOfRWQ8B-y?usp=sharing) of to generate your dataset for training.
+Now, you can either choose to download the [final dataset](https://drive.google.com/drive/folders/1sJPbiHCtD1fyeK_dmXeIJaTO7zwiDfYt?usp=sharing) and directly train the DebFace model on it, or you can use my custom-made scripts on the [manually cleaned version](https://drive.google.com/drive/folders/1QHmbNRW5kDv8l7MjCw3iFcaOfRWQ8B-y?usp=sharing) of to generate your dataset for training.
 
 __NOTE: If you download the dataset, please create a 'datasets/' folder in the root directory of this repository that you had cloned earlier in the [environment setup](#environment-setup) section and move this downloaded dataset folder 'IMFDB_final/' into the 'datasets/' folder for the training scripts to work smoothly__
 
@@ -160,7 +160,7 @@ __NOTE: As already mentioned earlier in the [datasets](#datasets) section, this 
 
 __NOTE: If you want to train the model on a dataset which has all the labels (satisfies all the constraints mentioned in the [datasets](#datasets) section), please use [train.py](/train.py) for the same.__
 
-Following are the steps to train the DebFace model on the [final dataset](https://drive.google.com/drive/folders/13oCfNzDiQTYgUsb9w9VJO5yf5xLzcF2U?usp=sharing) that you either already downloaded or genereated by following the steps in the [datasets](#datasets) section:
+Following are the steps to train the DebFace model on the [final dataset](https://drive.google.com/drive/folders/1sJPbiHCtD1fyeK_dmXeIJaTO7zwiDfYt?usp=sharing) that you either already downloaded or genereated by following the steps in the [datasets](#datasets) section:
 1. Navigate to the root directory of the repository, and run the [dataset_splitter.py](/dataset_splitter.py) that I have provided to split the final dataset into Train and Test using the command given below:
 
         python3 dataset_splitter.py FULL-PATH-TO-THE-CONFIG-FILE
