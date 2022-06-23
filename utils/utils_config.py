@@ -18,7 +18,7 @@ class ConfigParams():
         self.momentum = float(cfg["momentum"])
         self.weight_decay = float(cfg["weight_decay"])
         self.lr_decay_rate = float(cfg["lr_decay_rate"])
-        self.lr_scheduler = bool(cfg["lr_scheduler"])
+        self.lr_scheduler = (cfg["lr_scheduler"] == "True")
         self.lr_decay_milestones = [int(x) for x in cfg["lr_decay_milestones"].split(",")]
         self.device = cfg["device"]
         self.model_weights_dir = cfg["model_weights_dir"]
@@ -32,6 +32,8 @@ class ConfigParams():
         self.base_path = cfg["base_path"]
         self.val_dataset_size = int(cfg["val_dataset_size"])
         self.save_model_weights_every = int(cfg["save_model_weights_every"])
+        self.load_weights = (cfg["load_weights"] == "True")
+        self.load_weights_file = cfg["load_weights_file"]
 
 def get_config(config_file):
     config_obj = configparser.ConfigParser(inline_comment_prefixes="#")
