@@ -96,7 +96,7 @@ class IMFDB_Info():
         self.info_file.write(f"Gender distribution by subjects ('0': Male, '1': Female)\n")
         self.info_file.write(f"--------------------------------------------------------\n\n")
         self.info_file.write(f"{self.gender_info_dict}\n\n")
-        self.info_file.write(f"Age distribution by subjects ('0': CHILD, '1': YOUNG, '2': MIDDLE, '3': OLD)\n")
+        self.info_file.write(f"Age distribution by subjects ('0': YOUNG, '1': MIDDLE, '2': OLD)\n")
         self.info_file.write(f"----------------------------------------------------------------------------\n\n")
         self.info_file.write(f"{self.age_info_dict}\n\n")
         
