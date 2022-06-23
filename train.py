@@ -1,4 +1,5 @@
 import os
+from tqdm import tqdm
 import argparse
 from datetime import datetime
 
@@ -24,37 +25,38 @@ def train(dataloader, model, loss_fn_arr, train_loss_arr, optimizer, scheduler, 
     train_loss = 0
     correct_G, correct_A, correct_R, correct_ID, correct_Distr = 0, 0, 0, 0, 0 
 
-    for batch, (X, y) in enumerate(dataloader):
+    for batch, (X, y) in enumerate(tqdm(dataloader)):
         X = X.to(cfg.device)
+        y = y.to(cfg.device)
         X.requires_grad = True
 
         out_G1, out_G2, out_G3, out_G4, out_A1, out_A2, out_A3, out_A4, out_R1, out_R2, out_R3, out_R4, out_ID1, out_ID2, out_ID3, out_ID4, out_Distr1, out_Distr2 = model(X)
 
         y_G1 = y[:, 0].clone()
-        y_A1 = torch.full(y_G1.shape, 1)
-        y_R1 = torch.full(y_G1.shape, 1)
-        y_ID1 = torch.full(y_G1.shape, 1)
+        y_A1 = torch.full(y_G1.shape, 1).to(cfg.device)
+        y_R1 = torch.full(y_G1.shape, 1).to(cfg.device)
+        y_ID1 = torch.full(y_G1.shape, 1).to(cfg.device)
 
         y_A2  = y[:, 1].clone()
-        y_G2  = torch.full(y_A2.shape, 1)
-        y_R2  = torch.full(y_A2.shape, 1)
-        y_ID2 = torch.full(y_A2.shape, 1)
+        y_G2  = torch.full(y_A2.shape, 1).to(cfg.device)
+        y_R2  = torch.full(y_A2.shape, 1).to(cfg.device)
+        y_ID2 = torch.full(y_A2.shape, 1).to(cfg.device)
 
         y_R3  = y[:, 2].clone()
-        y_G3  = torch.full(y_R3.shape, 1)
-        y_A3  = torch.full(y_R3.shape, 1)
-        y_ID3 = torch.full(y_R3.shape, 1)
+        y_G3  = torch.full(y_R3.shape, 1).to(cfg.device)
+        y_A3  = torch.full(y_R3.shape, 1).to(cfg.device)
+        y_ID3 = torch.full(y_R3.shape, 1).to(cfg.device)
 
         y_ID4  = y[:, 3].clone()
-        y_G4  = torch.full(y_ID4.shape, 1)
-        y_A4  = torch.full(y_ID4.shape, 1)
-        y_R4 = torch.full(y_ID4.shape, 1)
+        y_G4  = torch.full(y_ID4.shape, 1).to(cfg.device)
+        y_A4  = torch.full(y_ID4.shape, 1).to(cfg.device)
+        y_R4 = torch.full(y_ID4.shape, 1).to(cfg.device)
 
-        y_Distr11 = torch.tensor([1 for i in range(batch_size)])
-        y_Distr12 = torch.tensor([1 for i in range(batch_size)])
+        y_Distr11 = torch.tensor([1 for i in range(batch_size)]).to(cfg.device)
+        y_Distr12 = torch.tensor([1 for i in range(batch_size)]).to(cfg.device)
 
-        y_Distr21 = torch.tensor([0 for i in range(batch_size)])
-        y_Distr22 = torch.tensor([1 for i in range(batch_size)])
+        y_Distr21 = torch.tensor([0 for i in range(batch_size)]).to(cfg.device)
+        y_Distr22 = torch.tensor([1 for i in range(batch_size)]).to(cfg.device)
 
         # Classification losses
         loss_G1 = loss_fn_arr[0](out_G1, y_G1)
@@ -100,8 +102,8 @@ def train(dataloader, model, loss_fn_arr, train_loss_arr, optimizer, scheduler, 
             correct_Distr += (out_Distr2.argmax(1) == y_Distr21).type(torch.float).sum().item()
             
             # if batch!=0 and batch % 10 == 0:
-            loss, current = (classification_loss.item() + adversarial_loss.item()), batch * len(X)
-            print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+            # loss, current = (classification_loss.item() + adversarial_loss.item()), batch * len(X)
+            # print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
         
         # For visualizing the model
@@ -150,35 +152,35 @@ def test(dataloader, model, loss_fn_arr, test_loss_arr, cfg):
     with torch.no_grad():
         for X, y in dataloader:
             X = X.to(cfg.device)
-            X.requires_grad = True
+            y = y.to(cfg.device)
 
             out_G1, out_G2, out_G3, out_G4, out_A1, out_A2, out_A3, out_A4, out_R1, out_R2, out_R3, out_R4, out_ID1, out_ID2, out_ID3, out_ID4, out_Distr1, out_Distr2 = model(X)
 
             y_G1 = y[:, 0].clone()
-            y_A1 = torch.full(y_G1.shape, 1)
-            y_R1 = torch.full(y_G1.shape, 1)
-            y_ID1 = torch.full(y_G1.shape, 1)
+            y_A1 = torch.full(y_G1.shape, 1).to(cfg.device)
+            y_R1 = torch.full(y_G1.shape, 1).to(cfg.device)
+            y_ID1 = torch.full(y_G1.shape, 1).to(cfg.device)
 
             y_A2  = y[:, 1].clone()
-            y_G2  = torch.full(y_A2.shape, 1)
-            y_R2  = torch.full(y_A2.shape, 1)
-            y_ID2 = torch.full(y_A2.shape, 1)
+            y_G2  = torch.full(y_A2.shape, 1).to(cfg.device)
+            y_R2  = torch.full(y_A2.shape, 1).to(cfg.device)
+            y_ID2 = torch.full(y_A2.shape, 1).to(cfg.device)
 
             y_R3  = y[:, 2].clone()
-            y_G3  = torch.full(y_R3.shape, 1)
-            y_A3  = torch.full(y_R3.shape, 1)
-            y_ID3 = torch.full(y_R3.shape, 1)
+            y_G3  = torch.full(y_R3.shape, 1).to(cfg.device)
+            y_A3  = torch.full(y_R3.shape, 1).to(cfg.device)
+            y_ID3 = torch.full(y_R3.shape, 1).to(cfg.device)
 
             y_ID4  = y[:, 3].clone()
-            y_G4  = torch.full(y_ID4.shape, 1)
-            y_A4  = torch.full(y_ID4.shape, 1)
-            y_R4 = torch.full(y_ID4.shape, 1)
+            y_G4  = torch.full(y_ID4.shape, 1).to(cfg.device)
+            y_A4  = torch.full(y_ID4.shape, 1).to(cfg.device)
+            y_R4 = torch.full(y_ID4.shape, 1).to(cfg.device)
 
-            y_Distr11 = torch.tensor([1 for i in range(batch_size)])
-            y_Distr12 = torch.tensor([1 for i in range(batch_size)])
+            y_Distr11 = torch.tensor([1 for i in range(batch_size)]).to(cfg.device)
+            y_Distr12 = torch.tensor([1 for i in range(batch_size)]).to(cfg.device)
 
-            y_Distr21 = torch.tensor([0 for i in range(batch_size)])
-            y_Distr22 = torch.tensor([1 for i in range(batch_size)])
+            y_Distr21 = torch.tensor([0 for i in range(batch_size)]).to(cfg.device)
+            y_Distr22 = torch.tensor([1 for i in range(batch_size)]).to(cfg.device)
 
             # Classification losses
             loss_G1 = loss_fn_arr[0](out_G1, y_G1)
@@ -240,14 +242,15 @@ def main(args):
 
     model = DebFace(cfg).to(cfg.device)
     # summary(model, (3, 112, 112))
+    print(cfg.load_weights)
+    if cfg.load_weights:
+        model.load_state_dict(torch.load(cfg.model_weights_dir + cfg.load_weights_file))
 
-    # model.load_state_dict(torch.load("/home/hrishi/Repos/DebFace/weights/19-06-2022_17:08:30_weights.pth"))
-
-    weight_G = torch.tensor([(1/cfg.n_gender_classes) for i in range(cfg.n_gender_classes)])
-    weight_A = torch.tensor([(1/cfg.n_age_classes) for i in range(cfg.n_age_classes)])
-    weight_R = torch.tensor([(1/cfg.n_race_classes) for i in range(cfg.n_race_classes)])
-    weight_ID = torch.tensor([(1/cfg.n_id_classes) for i in range(cfg.n_id_classes)])
-    weight_Distr = torch.tensor([(1/cfg.n_distr_classes) for i in range(cfg.n_distr_classes)])
+    weight_G = torch.tensor([(1/cfg.n_gender_classes) for i in range(cfg.n_gender_classes)]).to(cfg.device)
+    weight_A = torch.tensor([(1/cfg.n_age_classes) for i in range(cfg.n_age_classes)]).to(cfg.device)
+    weight_R = torch.tensor([(1/cfg.n_race_classes) for i in range(cfg.n_race_classes)]).to(cfg.device)
+    weight_ID = torch.tensor([(1/cfg.n_id_classes) for i in range(cfg.n_id_classes)]).to(cfg.device)
+    weight_Distr = torch.tensor([(1/cfg.n_distr_classes) for i in range(cfg.n_distr_classes)]).to(cfg.device)
 
     loss_fn_arr = [nn.CrossEntropyLoss(), nn.CrossEntropyLoss(weight=weight_G), nn.CrossEntropyLoss(weight=weight_A), nn.CrossEntropyLoss(weight=weight_R), nn.CrossEntropyLoss(weight=weight_ID), nn.CrossEntropyLoss(weight=weight_Distr)]
 
@@ -293,11 +296,11 @@ def main(args):
         train(dataloader, model, loss_fn_arr, train_loss_arr, optimizer, scheduler, cfg)
         # test(test_dataloader, model, loss_fn_arr, test_loss_arr, cfg)
         test(dataloader, model, loss_fn_arr, test_loss_arr, cfg)
-
+        
         if cfg.save_model_weights_every > 0 and (t + 1)%cfg.save_model_weights_every == 0:
             now = datetime.now()
             dt_string = now.strftime("%d-%m-%Y_%H:%M:%S_")
-            torch.save(model.state_dict(), cfg.model_weights_dir + dt_string + "weights.pth")
+            torch.save(model.state_dict(), cfg.model_weights_dir + dt_string + f"weights_epoch_{t+1}.pth")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
