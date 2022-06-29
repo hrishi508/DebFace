@@ -2,6 +2,7 @@ import os
 from tqdm import tqdm
 import argparse
 from datetime import datetime
+import matplotlib.pyplot as plt
 
 import torch
 from torch import nn
@@ -17,7 +18,7 @@ from utils.utils_config import ConfigParams
 
 def train(dataloader, model, loss_fn_arr, train_loss_arr, optimizer, scheduler, cfg):
     # size = len(dataloader.dataset)
-    size = 100 # size of dataset
+    size = 20 # size of dataset
     num_batches = len(dataloader)
     batch_size = int(size/num_batches)
     
@@ -143,7 +144,7 @@ def train(dataloader, model, loss_fn_arr, train_loss_arr, optimizer, scheduler, 
 
 def test(dataloader, model, loss_fn_arr, test_loss_arr, cfg):
     # size = len(dataloader.dataset)
-    size = 100 # size of dataset
+    size = 20 # size of dataset
     num_batches = len(dataloader)
     batch_size = int(size/num_batches)
     test_loss = 0
@@ -275,7 +276,7 @@ def main(args):
 
     # creating a random dataset (same shape as the facial dataset we will be using) for testing the code logic
     dataloader = []
-    for i in range(10):
+    for i in range(2):
         X_tmp = torch.randn((10, 3, 112, 112))
         # y = torch.tensor([[0, 1, 2, 0], [0, 1, 2, 0], [0, 1, 2, 0]])
         # assuming 4 classes each for gender, age, race and id
@@ -300,7 +301,19 @@ def main(args):
         if cfg.save_model_weights_every > 0 and (t + 1)%cfg.save_model_weights_every == 0:
             now = datetime.now()
             dt_string = now.strftime("%d-%m-%Y_%H:%M:%S_")
-            torch.save(model.state_dict(), cfg.model_weights_dir + dt_string + f"weights_epoch_{t+1}.pth")
+            torch.save(model.state_dict(), cfg.model_weights_dir + dt_string + f"debface_epoch_{t+1}_trial_" + cfg.trial_number + ".pth")
+
+    if cfg.plot_losses:
+        x = [i+1 for i in range(cfg.num_epoch)]
+        plt.plot(x, train_loss_arr, 'g', label='train')
+        plt.plot(x, test_loss_arr, 'r', label='test')
+        plt.ylabel("Loss")
+        plt.xlabel("Epochs")
+        plt.legend()
+
+        now = datetime.now()
+        dt_string = now.strftime("%d-%m-%Y_%H:%M:%S_")
+        plt.savefig(cfg.plots_dir + dt_string + "debface_trial_" + cfg.trial_number + ".png")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

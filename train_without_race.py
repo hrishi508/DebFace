@@ -345,7 +345,19 @@ def main(args):
         if cfg.save_model_weights_every > 0 and (t + 1)%cfg.save_model_weights_every == 0:
             now = datetime.now()
             dt_string = now.strftime("%d-%m-%Y_%H:%M:%S_")
-            torch.save(model.state_dict(), cfg.model_weights_dir + dt_string + f"weights_epoch_{t+1}.pth")
+            torch.save(model.state_dict(), cfg.model_weights_dir + dt_string + f"debface_epoch_{t+1}_trial_" + cfg.trial_number + ".pth")
+
+    if cfg.plot_losses:
+        x = [i+1 for i in range(cfg.num_epoch)]
+        plt.plot(x, train_loss_arr, 'g', label='train')
+        plt.plot(x, test_loss_arr, 'r', label='test')
+        plt.ylabel("Loss")
+        plt.xlabel("Epochs")
+        plt.legend()
+
+        now = datetime.now()
+        dt_string = now.strftime("%d-%m-%Y_%H:%M:%S_")
+        plt.savefig(cfg.plots_dir + dt_string + "debface_trial_" + cfg.trial_number + ".png")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(

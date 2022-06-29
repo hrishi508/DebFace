@@ -34,6 +34,9 @@ class ConfigParams():
         self.save_model_weights_every = int(cfg["save_model_weights_every"])
         self.load_weights = (cfg["load_weights"] == "True")
         self.load_weights_file = cfg["load_weights_file"]
+        self.plots_dir = cfg["plots_dir"]
+        self.plot_losses = (cfg["plot_losses"] == "True")
+        self.trial_number = cfg["trial_number"]
 
 def get_config(config_file):
     config_obj = configparser.ConfigParser(inline_comment_prefixes="#")
