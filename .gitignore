@@ -19,5 +19,6 @@ __pycache__/
 datasets/
 weights/
 temp/
-logs.txt
+plots/
 model.py
+logs.txt
