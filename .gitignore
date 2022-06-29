@@ -19,3 +19,5 @@ __pycache__/
 datasets/
 weights/
 temp/
+logs.txt
+model.py

@@ -339,7 +339,7 @@ def main(args):
         test(test_loader, model, loss_fn_arr, test_loss_arr, cfg)
 
         # code used for testing model logic using random dataset created above
-        # train(dataloader, model, loss_fn_arr, train_loss_arr, optimizer, cfg)
+        # train(dataloader, model, loss_fn_arr, train_loss_arr, optimizer, scheduler, cfg)
         # test(dataloader, model, loss_fn_arr, test_loss_arr, cfg)
         
         if cfg.save_model_weights_every > 0 and (t + 1)%cfg.save_model_weights_every == 0:

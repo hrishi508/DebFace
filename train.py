@@ -242,7 +242,7 @@ def main(args):
 
     model = DebFace(cfg).to(cfg.device)
     # summary(model, (3, 112, 112))
-    print(cfg.load_weights)
+    # print(cfg.load_weights)
     if cfg.load_weights:
         model.load_state_dict(torch.load(cfg.model_weights_dir + cfg.load_weights_file))
 
