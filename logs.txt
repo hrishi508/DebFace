@@ -1,0 +1,21 @@
+Trail 1
+--------------------------------------------------------------------------------------------------
+
+batch_size = 64          # No. of images in a batch
+num_epoch = 15           # no. of epochs
+lr = 0.1              # learning rate
+momentum = 0.9          # SGD momentum
+weight_decay = 0.01     # weight decay (regularization)
+lr_scheduler = True     # Set to "True" if you want leraning rate scheduling, else set to "False"
+lr_decay_rate = 0.1     # rate at which the learning rate is decreased
+lr_decay_milestones = 8, 13, 15 # Comma seperated integers in increasing order denoting the exact epochs at which you want to decay the learning rate
+val_dataset_size = 1500 # No. of images in the validation dataset
+
+Training - Accuracy_G: 68.6%, Accuracy_A: 45.6%, Accuracy_ID: 4.4%, Accuracy_Distr: 84.4%, Avg loss: 18.954743 
+
+Testing - Accuracy_G: 67.8%, Accuracy_A: 43.4%, Accuracy_ID: 4.3%, Accuracy_Distr: 93.6%, Avg loss: 19.238669
+
+
+--------------------------------------------------------------------------------------------------
+
+
