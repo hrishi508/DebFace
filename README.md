@@ -149,7 +149,7 @@ The script [am_softmax.py](/backbones/am_softmax.py) has been directly taken fro
 The following scripts have been created by me from scratch to provide a seamless implementation of the model given in the [DebFace](#1) paper:
 1. [encoder.py](/backbones/encoder.py) - This script defines the encoder class that initializes the ArcFace50 encoder provided by [InsightFace](https://github.com/deepinsight/insightface) and appends a ReLU layer to it.
 
-2. [classifier.py](/backbones/classifier.py) - This script contains the classifier class whose input and outputs can be modfied to create the various age, gender, race and ID classifiers as given in the model architecture of the [DebFace](#1) paper. Since the exctl details of the classifiers was missing in the paper, I have used a single layer neural network in the script.
+2. [classifier.py](/backbones/classifier.py) - This script contains the classifier class whose input and outputs can be modfied to create the various age, gender, race and ID classifiers as given in the model architecture of the [DebFace](#1) paper. Since the exact details of the classifiers were missing in the paper, I have used a single layer neural network in the script.
 
 3. [debface.py](/backbones/debface.py) - This script contains the 'DebFace' class which basically initializes the encoder and all the demographic and ID classifiers and integrates them seamlessly. __NOTE: I have also provided a 'DebFaceWithoutRace' class, this is the same model as above but excluding the 'race' classifier and all its connection. This is the class that has been used in this project for reasons that will be covered in the section below.__
 
